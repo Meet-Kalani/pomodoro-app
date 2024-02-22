@@ -1,0 +1,51 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    height: 100vh;
+    font-family: "Montserrat", sans-serif;
+    background-color: #004F2D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#pomodoro-app{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.progress-container{
+    display: flex;
+    gap: 8px;
+}
+
+.progress-container .progress{
+    background-color: #FFF;
+    border: 2px solid black;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.time-container{
+    font-size: 3rem;
+}
+
+.reset-btn-container .reset-btn{
+    border: none;
+    background-color: #C33C54;
+    color: #fff;
+    padding: 8px 26px;
+    border-radius: 5px;
+    font-family: "Montserrat", sans-serif;
+    cursor: pointer;
+}
