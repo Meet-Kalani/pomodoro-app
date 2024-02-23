@@ -32,7 +32,7 @@ closeBtn.addEventListener('click', () => {
 
 function startTimer() {
     if (progressCycle == 5) resetTimer();
-    resetTime = setInterval(changeTime, 1);
+    resetTime = setInterval(changeTime, 1000);
 }
 
 function resetTimer() {
