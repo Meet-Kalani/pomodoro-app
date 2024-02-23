@@ -1,79 +1,88 @@
+// DOM elements
 const hourElement = document.querySelector('.time-hour');
 const minuteElement = document.querySelector('.time-minute');
 const secondElement = document.querySelector('.time-second');
 const timeContainerElement = document.querySelector('.time-container');
 const resetBtnElement = document.querySelector('.reset-btn');
 const progressContainerElement = document.querySelector('.progress-container');
+const mainContainer = document.querySelector('#pomodoro-app');
+const achievementContainer = document.querySelector('.achievement-container');
+const focusMsgContainer = document.querySelector('.focus-msg-container');
+const closeBtn = document.querySelector('.close-icon');
+const resetCycleBtn = document.querySelector('.reset-cycle-btn');
 
-let second = 0;
-let minute = 0;
-let hour = 0;
-let resetTime;
-let isBreakTime = false;
-let progress = 0;
+// Variables for tracking time and tracking progress
+let second = 0,
+    minute = 0,
+    hour = 0,
+    resetTime,
+    isBreakTime = false,
+    progressCycle = 0,
+    progressBarValue = 0;
 
-let progressStartValue = 0;
-    let progressEndValue = 100;
+timeContainerElement.addEventListener('click', startTimer);             // Start timer when time container is clicked
+resetBtnElement.addEventListener('click', resetTimer);                  // Reset timer when reset button is clicked
+resetCycleBtn.addEventListener('click', resetTimer);                    // Reset timer when reset cycle button is clicked
+document.addEventListener("visibilitychange", handleVisibilityChange);  // Handle visibility change event
 
-timeContainerElement.addEventListener('click', startTimer);
-resetBtnElement.addEventListener('click', resetTimer);
+// Hide focus message container when close button is clicked
+closeBtn.addEventListener('click', () => {
+    hideElement(focusMsgContainer);
+})
 
 function startTimer() {
-    if(progress == 5){
-        resetTimer()
-    }
-    
-    resetTime = setInterval(changeTime, 100);
-    console.log(progress);
-    // if(progress == 4){
-    //     alert('congratulations')
-    //     resetTimer();
-
-    // }
+    if (progressCycle == 5) resetTimer();
+    resetTime = setInterval(changeTime, 1);
 }
 
 function resetTimer() {
-    second = 0;
-    minute = 0;
-    hour = 0;
+    progressBarValue = 0;
+    // enabling time click which was disabled during tab(screen) change scenario
+    enableTimeClick();
+
+    // Resetting time variables and time display
+    hour = minute = second = 0;
     secondElement.textContent = "00";
-    minuteElement.textContent = "00";
-    hourElement.textContent = "00";
+    hourElement.textContent = minuteElement.textContent = "00:";
 
-    if(this.name === 'reset-btn'){
+    // Resetting progress indicators
+    if (this.name === 'reset-btn' || this.name === 'reset-cycle-btn') {
         resetProgress();
         isBreakTime = false;
     }
 
-    if(progress === 5){
-        alert('you are done!')
-        resetProgress();
-        isBreakTime = false;
-        resetTimer();
+    if (this.name === 'reset-cycle-btn') hideElement(achievementContainer);
 
-    }
-    timeContainerElement.style.background = `conic-gradient(#7d2ae8 3.6deg,#ededed 0deg)`;
+    // Resetting Progress bar
+    timeContainerElement.style.background = `conic-gradient(#7d2ae8 0deg,#ededed 0deg)`;
     clearInterval(resetTime);
 }
 
+let previousValue = null;
+
+// function for checking if the value has changed
+function checkValueChanged(currentValue) {
+    const changed = previousValue !== currentValue;
+    previousValue = currentValue;
+    return changed;
+}
+
 function changeTime() {
-        
-    progressStartValue++;
-    
-    minuteElement.textContent = `${progressStartValue}`
-    // timeContainerElement.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 15}deg,#ededed 0deg)`;
-    
-    if(isBreakTime){
-        timeContainerElement.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 71}deg,#ededed 0deg)`;
-    } else {
-        timeContainerElement.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 15}deg,#ededed 0deg)`;
+    // Increase progressbar with minute spent
+    if (checkValueChanged(progressBarValue)) {
+        if (isBreakTime) {
+            timeContainerElement.style.background = `conic-gradient(#C33C54 ${progressBarValue * 71}deg,#ededed 0deg)`;
+        } else {
+            timeContainerElement.style.background = `conic-gradient(#C33C54 ${progressBarValue * 15}deg,#ededed 0deg)`;
+        }
     }
 
-
+    // Changing time
     second++;
     if (second == 60) {
         second = 0;
         minute++;
+        progressBarValue++;
     }
 
     if (minute == 60) {
@@ -81,48 +90,74 @@ function changeTime() {
         hour++;
     }
 
+    // Printing current time
     secondElement.textContent = second.toLocaleString('en-US', { minimumIntegerDigits: 2 });
-    minuteElement.textContent = minute.toLocaleString('en-US', { minimumIntegerDigits: 2 });
-    hourElement.textContent = hour.toLocaleString('en-US', { minimumIntegerDigits: 2 });
+    minuteElement.textContent = minute.toLocaleString('en-US', { minimumIntegerDigits: 2 }) + ":";
+    hourElement.textContent = hour.toLocaleString('en-US', { minimumIntegerDigits: 2 }) + ":";
 
-    // focus time then change the indicator after completeion
-    if (!isBreakTime && second == 5) {
-        progressStartValue = 0;
-        resetTimer();
-        isBreakTime = !isBreakTime;
-        progressContainerElement.children[progress].style.backgroundColor = "#291711";
-        progress++;
-    } else if(isBreakTime && second == 5){
-        resetTimer();
-        isBreakTime = !isBreakTime;
-        progressContainerElement.children[progress].style.backgroundColor = "#291711";
-        progress++;
+    // Changing cycle in 25 minute for focus time and 5 minute for break
+    if (!isBreakTime && minute == 25) {
+        changeProgress();
+    } else if (isBreakTime && minute == 5) {
+        changeProgress();
     }
 }
 
-function resetProgress(){
-    //  working on resetting the progress indicators
-    let progressIcons =  progressContainerElement.children;
-    for(let i = 0;i < progressIcons.length;i++){
+function displayAchievement(value) {
+    if (value === 5) {
+        achievementContainer.style.display = 'flex';
+    }
+}
+
+function resetProgress() {
+    // Changing all the progress indicator to white so user can know that cycle has been reset
+    const progressIcons = progressContainerElement.children;
+    for (let i = 0; i < progressIcons.length; i++) {
         progressIcons[i].style.backgroundColor = '#fff';
     }
-    progress = 0;
+    progressCycle = 0;
 }
 
-function changeProgress(){
+function changeProgress() {
+    progressBarValue = 0;
+    resetTimer();
 
+    // Changing current cycle from break time to focus time and vice versa
+    isBreakTime = !isBreakTime;
+
+    // Changing color of progress indicator so user can track how much he has accomplished
+    progressContainerElement.children[progressCycle].style.backgroundColor = "#C33C54";
+    progressCycle++;
+    
+    // only displayed if the user has completed entire lifecycle of pomodoro app (i.e 5 cycle in total of focus and break)
+    displayAchievement(progressCycle);
 }
 
-// let progressStartValue = 0;
-//     let progressEndValue = 100;
-    
-//     let progressAnimation = setInterval(()=>{
-//         progressStartValue++;
-    
-//         countMinute.textContent = `${progressStartValue}`
-//         timeContainerElement.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 3.6}deg,#ededed 0deg)`
-    
-//         if(progressStartValue === progressEndValue){
-//             clearInterval(progressAnimation);
-//         }
-//     },100)
+function hideElement(element) {
+    element.style.display = 'none';
+}
+
+function enableTimeClick() {
+    timeContainerElement.addEventListener('click', startTimer);
+}
+
+function handleVisibilityChange() {
+    if (document.visibilityState !== 'hidden') {
+        // displaying message to user for leaving the screen
+        focusMsgContainer.style.display = 'initial';
+
+        // removing listener so user can't continue with the progress
+        timeContainerElement.removeEventListener('click', startTimer);
+        clearInterval(resetTime);
+
+        // changing color of progress indicator as user has left the screen
+        const progressIcons = Array.from(progressContainerElement.children);
+        progressIcons.forEach(icon => {
+            if (icon.style.backgroundColor === "rgb(195, 60, 84)") {
+                icon.style.backgroundColor = "red";  
+            } else {
+                return;
+            }
+        });
+    }
+}

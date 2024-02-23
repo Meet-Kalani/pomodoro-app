@@ -21,21 +21,32 @@
 
 <body>
     <main id="pomodoro-app">
-        <div class="progress-container">
-            <div class="progress"></div>
-            <div class="progress"></div>
-            <div class="progress"></div>
-            <div class="progress"></div>
-            <div class="progress"></div>
+        <!-- Hidden message container that appears after completion of entire lifecycle of pomodoro -->
+        <div class="achievement-container">
+            <span class="achievement-msg">Congratulations! You've successfully completed a Pomodoro cycle. Well done!</span>
+            <button type="reset" class="reset-cycle-btn" name="reset-cycle-btn">Wanna do it Again!</button>
         </div>
-        <div class="time-container">
-            <!-- <span class="time-spent">05:69</span> -->
-            <span class="time-hour">00</span>
-            <span class="time-minute">00</span>
-            <span class="time-second">00</span>
+        <!-- Hidden message container that appears when tab's focus is changed -->
+        <div class="focus-msg-container">
+            <div class="focus-msg">Oops! It seems You've lost focus for a moment. Let's reset and get back on track.</div>
+            <span class="close-icon">X</span>
         </div>
-        <div class="reset-btn-container">
-            <button type="reset" class="reset-btn" name="reset-btn">Reset</button>
+        <div class="wrapper">
+            <div class="progress-container">
+                <div class="progress"></div>
+                <div class="progress"></div>
+                <div class="progress"></div>
+                <div class="progress"></div>
+                <div class="progress"></div>
+            </div>
+            <div class="time-container">
+                <span class="time-hour">00:</span>
+                <span class="time-minute">00:</span>
+                <span class="time-second">00</span>
+            </div>
+            <div class="reset-btn-container">
+                <button type="reset" class="reset-btn" name="reset-btn">Reset</button>
+            </div>
         </div>
     </main>
 
