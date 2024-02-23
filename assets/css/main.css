@@ -34,10 +34,33 @@ body{
     width: 32px;
     height: 32px;
     border-radius: 50%;
+    
 }
 
 .time-container{
     font-size: 3rem;
+
+    position: relative;
+    height: 250px;
+    width: 250px;
+    border-radius: 50%;
+    background: conic-gradient(#7d2ae8 3.6deg,#ededed 0deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.time-container::before{
+    content: "";
+    position: absolute;
+    height: 210px;
+    width: 210px;
+    border-radius: 50%;
+    background-color: #fff;
+}
+
+.time-container span{
+    position: relative;
 }
 
 .reset-btn-container .reset-btn{
